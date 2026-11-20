@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crucible Nightbeast — Оценка</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body data-boss-id="crucible-nightbeast" data-feyn-score="9">
+  <a href="../nightreign.html" class="back-link">← Назад к Nightreign</a>
+
+  <div class="boss-page">
+    <h1>Crucible Nightbeast</h1>
+    <p class="subtitle">Elden Ring Nightreign · 2025</p>
+
+    <article class="boss-card">
+      <div class="boss-portrait">
+        <div class="placeholder">
+          <span>🔥</span>
+          Портрет босса<br>Crucible Nightbeast
+        </div>
+      </div>
+
+      <div class="video-frame">
+        <div class="video-player">
+          <div class="play-button"></div>
+          <div class="video-label">Видео сражения (заглушка)</div>
+        </div>
+      </div>
+
+      <div class="boss-content">
+        <h2 class="boss-name">Crucible Nightbeast</h2>
+
+        <div class="ratings-section">
+          <div class="rating-row">
+            <span class="rating-label">Оценка Фейна:</span>
+            <div class="stars" id="feyn-stars"></div>
+            <span class="rating-score">9/10</span>
+          </div>
+
+          <div class="rating-row">
+            <span class="rating-label">Зрительская оценка:</span>
+            <div class="stars" id="audience-stars"></div>
+            <span class="rating-score"><span id="audience-score">0</span>/10</span>
+            <span class="rating-count" id="audience-count">(нет оценок)</span>
+          </div>
+
+          <div class="rating-row" style="margin-top: 0.8rem;">
+            <span class="rating-label">Ваша оценка:</span>
+            <div class="stars interactive-stars" id="interactive-stars"></div>
+            <button class="rate-btn" id="rate-btn" onclick="submitRating()" disabled>Примите cookies</button>
+          </div>
+          <p class="rate-message" id="rate-message">Чтобы оставить оценку, примите использование cookies.</p>
+        </div>
+
+        <p class="description">
+          Описание босса будет здесь. Placeholder text. Зверь из тигеля, мутировавший под влиянием Ночи. Масштабный бой с несколькими фазами и изменениями арены. Один из визуально и механически ярких моментов игры.
+        </p>
+      </div>
+    </article>
+  </div>
+
+  <footer>Crucible Nightbeast · Elden Ring Nightreign</footer>
+
+  <div id="cookie-banner" class="cookie-banner">
+    <p>
+      <strong>Мы используем cookies</strong> для сохранения ваших оценок боссов. 
+      Без вашего согласия оценки не будут сохраняться и учитываться в зрительском рейтинге.
+    </p>
+    <div class="cookie-actions">
+      <button class="cookie-btn accept" onclick="acceptCookies()">Принять</button>
+      <button class="cookie-btn decline" onclick="declineCookies()">Отклонить</button>
+    </div>
+  </div>
+
+  <script src="../script.js"></script>
+</body>
+</html>
