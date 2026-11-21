@@ -175,7 +175,7 @@ header p {
 
 /* Boss list page (game page) */
 .boss-list {
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 1rem 1.5rem 3rem;
 }
@@ -196,11 +196,13 @@ header p {
 }
 
 .boss-list-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.2rem 1.5rem;
+  border-radius: 10px;
+  padding: 0.9rem 1.2rem;
   margin-bottom: 1rem;
   text-decoration: none;
   color: inherit;
@@ -211,30 +213,58 @@ header p {
   background: var(--bg-card-hover);
   border-color: var(--gold-dim);
   transform: translateX(6px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+}
+
+.boss-list-thumb {
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #0d0d12;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.boss-list-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .boss-list-item h3 {
   font-family: 'Cinzel', serif;
-  font-size: 1.25rem;
-  margin-bottom: 0.3rem;
+  font-size: 1.2rem;
+  margin-bottom: 0.45rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .boss-list-item .mini-ratings {
   display: flex;
-  gap: 1.5rem;
-  font-size: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.4rem;
+  font-size: 0.82rem;
   color: var(--text-dim);
 }
 
-.boss-list-item .mini-ratings span {
+.boss-list-item .mini-ratings > div {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
 }
 
 .boss-list-item .mini-stars {
-  color: var(--gold);
   letter-spacing: 1px;
+  font-size: 0.95rem;
+}
+
+.boss-list-item .mini-stars .filled {
+  color: var(--gold);
+}
+
+.boss-list-item .mini-stars .empty {
+  color: #3a3a42;
 }
 
 /* Individual Boss page */
