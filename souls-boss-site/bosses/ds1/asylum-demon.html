@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Демон Прибежища — Оценка</title>
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body data-boss-id="asylum-demon" data-feyn-score="6">
+  <a href="../../dark-souls-1.html" class="back-link">← Назад к Dark Souls</a>
+
+  <div class="boss-page">
+    <h1>Демон Прибежища</h1>
+    <p class="subtitle">Dark Souls · 2011</p>
+
+    <article class="boss-card">
+      <div class="boss-portrait">
+        <img src="../../ImgAndVid/Ds1AsylumDemon.jpeg" alt="Демон Прибежища" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+
+      <div class="video-frame">
+        <div class="video-player">
+          <div class="play-button"></div>
+          <div class="video-label">Видео сражения (заглушка)</div>
+        </div>
+      </div>
+
+      <div class="boss-content">
+        <h2 class="boss-name">Демон Прибежища</h2>
+
+        <div class="ratings-section">
+          <div class="rating-row">
+            <span class="rating-label">Оценка Фейна:</span>
+            <span class="rating-score" id="feyn-score">6/10</span>
+          </div>
+
+          <div class="rating-row">
+            <span class="rating-label">Зрительская оценка:</span>
+            <span class="rating-score"><span id="audience-score">0</span>/10</span>
+            <span class="rating-count" id="audience-count">(нет оценок)</span>
+          </div>
+
+          <div class="rating-row" style="margin-top: 0.8rem;">
+            <span class="rating-label">Ваша оценка:</span>
+            <div class="stars interactive-stars" id="interactive-stars"></div>
+            <button class="rate-btn" id="rate-btn" onclick="submitRating()" disabled>Примите cookies</button>
+          </div>
+          <p class="rate-message" id="rate-message">Чтобы оставить оценку, примите использование cookies.</p>
+        </div>
+
+        <p class="description">
+          Описание босса будет здесь. Placeholder text.
+        </p>
+      </div>
+    </article>
+  </div>
+
+  <footer>Демон Прибежища · Dark Souls</footer>
+
+  <div id="cookie-banner" class="cookie-banner">
+    <p>
+      <strong>Мы используем cookies</strong> для сохранения ваших оценок боссов. 
+      Без вашего согласия оценки не будут сохраняться и учитываться в зрительском рейтинге.
+    </p>
+    <div class="cookie-actions">
+      <button class="cookie-btn accept" onclick="acceptCookies()">Принять</button>
+      <button class="cookie-btn decline" onclick="declineCookies()">Отклонить</button>
+    </div>
+  </div>
+
+  <script src="../../script.js"></script>
+</body>
+</html>

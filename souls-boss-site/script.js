@@ -3,6 +3,11 @@
 const CONSENT_KEY = 'souls_cookie_consent';
 const RATINGS_KEY = 'souls_audience_ratings';
 
+// Special bosses with non-standard ranges
+const SPECIAL_BOSSES = {
+  'centipede-demon': { min: -100, max: 10, stars: 110 }
+};
+
 // --- Consent ---
 function getConsent() {
   return localStorage.getItem(CONSENT_KEY); // 'accepted' | 'declined' | null
@@ -11,7 +16,6 @@ function getConsent() {
 function setConsent(value) {
   localStorage.setItem(CONSENT_KEY, value);
   updateBanner();
-  // Re-render ratings on all pages that need it
   if (typeof initBossRating === 'function') {
     initBossRating();
   }
@@ -20,7 +24,6 @@ function setConsent(value) {
 function updateBanner() {
   const banner = document.getElementById('cookie-banner');
   if (!banner) return;
-
   const consent = getConsent();
   if (consent === null) {
     banner.classList.add('visible');
@@ -53,11 +56,9 @@ function getBossRatings(bossId) {
 
 function addBossRating(bossId, score) {
   if (getConsent() !== 'accepted') return false;
-
   const all = getAllRatings();
   // One rating per browser per boss (overwrite)
   all[bossId] = [score];
-
   localStorage.setItem(RATINGS_KEY, JSON.stringify(all));
   return true;
 }
@@ -65,40 +66,42 @@ function addBossRating(bossId, score) {
 function getAverageRating(bossId) {
   const ratings = getBossRatings(bossId);
   if (ratings.length === 0) return { avg: 0, count: 0 };
-
   const sum = ratings.reduce((a, b) => a + b, 0);
   const avg = Math.round((sum / ratings.length) * 10) / 10;
   return { avg, count: ratings.length };
 }
 
 // --- UI helpers ---
-function renderStars(container, score, max = 10) {
+function renderStars(container, score, max = 10, min = 0) {
   if (!container) return;
   container.innerHTML = '';
-  const fullStars = Math.floor(score);
+  const range = max - min;
+  const normalized = score - min; // 0 .. range
+  const filledCount = Math.max(0, Math.min(range, Math.round(normalized)));
 
-  for (let i = 1; i <= max; i++) {
+  for (let i = 1; i <= range; i++) {
     const star = document.createElement('span');
     star.className = 'star';
     star.textContent = '★';
-    star.dataset.value = i;
-
-    if (i <= fullStars) {
+    star.dataset.value = min + i;
+    if (i <= filledCount) {
       star.classList.add('filled');
     }
-
     container.appendChild(star);
   }
 }
 
 // --- Boss page rating logic ---
 let selectedRating = 0;
+let currentMin = 0;
+let currentMax = 10;
 
-function highlightStars(container, upTo) {
+function highlightStars(container, upToValue) {
   if (!container) return;
   const stars = container.querySelectorAll('.star');
-  stars.forEach((star, idx) => {
-    if (idx < upTo) {
+  stars.forEach(star => {
+    const val = parseInt(star.dataset.value);
+    if (val <= upToValue) {
       star.classList.add('filled');
     } else {
       star.classList.remove('filled');
@@ -115,11 +118,9 @@ function bindInteractiveStars(container) {
       const val = parseInt(star.dataset.value);
       highlightStars(container, val);
     });
-
     star.addEventListener('mouseleave', () => {
       highlightStars(container, selectedRating);
     });
-
     star.addEventListener('click', () => {
       selectedRating = parseInt(star.dataset.value);
       highlightStars(container, selectedRating);
@@ -131,35 +132,45 @@ function initBossRating() {
   const bossId = document.body.dataset.bossId;
   if (!bossId) return;
 
+  // Determine range
+  const special = SPECIAL_BOSSES[bossId];
+  if (special) {
+    currentMin = special.min;
+    currentMax = special.max;
+  } else {
+    currentMin = 0;
+    currentMax = 10;
+  }
+
   const feynScore = parseFloat(document.body.dataset.feynScore) || 0;
-  const feynContainer = document.getElementById('feyn-stars');
-  const audienceContainer = document.getElementById('audience-stars');
+  const feynScoreEl = document.getElementById('feyn-score');
   const audienceScoreEl = document.getElementById('audience-score');
   const audienceCountEl = document.getElementById('audience-count');
   const rateBtn = document.getElementById('rate-btn');
   const rateMsg = document.getElementById('rate-message');
   const interactiveContainer = document.getElementById('interactive-stars');
 
-  // Render Feyn (fixed)
-  renderStars(feynContainer, feynScore);
+  // Numeric Feyn
+  if (feynScoreEl) {
+    feynScoreEl.textContent = `${feynScore}/10`;
+  }
 
-  // Render current audience
+  // Numeric audience
   const { avg, count } = getAverageRating(bossId);
-  renderStars(audienceContainer, avg);
-
   if (audienceScoreEl) {
     audienceScoreEl.textContent = avg === 0 ? '0' : avg.toFixed(1);
   }
   if (audienceCountEl) {
-    audienceCountEl.textContent = count > 0 
-      ? `(${count} ${count === 1 ? 'оценка' : 'оценок'})` 
+    audienceCountEl.textContent = count > 0
+      ? `(${count} ${count === 1 ? 'оценка' : 'оценок'})`
       : '(нет оценок)';
   }
 
-  // Interactive stars — always render
+  // Interactive stars
   const prev = getBossRatings(bossId);
-  selectedRating = prev.length > 0 ? prev[0] : 0;
-  renderStars(interactiveContainer, selectedRating);
+  selectedRating = prev.length > 0 ? prev[0] : currentMin;
+  const starCount = currentMax - currentMin;
+  renderStars(interactiveContainer, selectedRating, currentMax, currentMin);
 
   const consent = getConsent();
 
@@ -175,11 +186,12 @@ function initBossRating() {
     } else {
       rateBtn.disabled = false;
       rateBtn.textContent = 'Отправить оценку';
-      if (rateMsg) rateMsg.textContent = selectedRating > 0 ? `Текущая ваша оценка: ${selectedRating}/10` : '';
+      if (rateMsg) rateMsg.textContent = selectedRating !== currentMin || prev.length
+        ? `Текущая ваша оценка: ${selectedRating}`
+        : '';
       if (interactiveContainer) {
         interactiveContainer.style.opacity = '1';
         interactiveContainer.style.pointerEvents = 'auto';
-        // Make stars look interactive
         interactiveContainer.classList.add('interactive-stars');
         bindInteractiveStars(interactiveContainer);
       }
@@ -189,9 +201,11 @@ function initBossRating() {
 
 function submitRating() {
   const bossId = document.body.dataset.bossId;
-  if (!bossId || selectedRating < 1) {
+  if (!bossId) return;
+
+  if (selectedRating < currentMin || selectedRating > currentMax) {
     const rateMsg = document.getElementById('rate-message');
-    if (rateMsg) rateMsg.textContent = 'Выберите оценку от 1 до 10 звёзд.';
+    if (rateMsg) rateMsg.textContent = `Выберите оценку от ${currentMin} до ${currentMax}.`;
     return;
   }
 
@@ -203,14 +217,34 @@ function submitRating() {
   const ok = addBossRating(bossId, selectedRating);
   if (ok) {
     const rateMsg = document.getElementById('rate-message');
-    if (rateMsg) rateMsg.textContent = `Спасибо! Ваша оценка ${selectedRating}/10 сохранена.`;
-    // Refresh displayed audience rating
+    if (rateMsg) rateMsg.textContent = `Спасибо! Ваша оценка ${selectedRating} сохранена.`;
     initBossRating();
   }
 }
 
 // Init on load
+
+// --- Update audience scores on list cards ---
+function updateListAudienceScores() {
+  document.querySelectorAll(".boss-list-item").forEach(card => {
+    const href = card.getAttribute("href") || "";
+    // extract boss id from path like bosses/ds1/asylum-demon.html
+    const match = href.match(/\/([a-z0-9-]+)\.html$/);
+    if (!match) return;
+    const bossId = match[1];
+    const { avg, count } = getAverageRating(bossId);
+
+    // Find the audience score element inside this card
+    const scoreEl = card.querySelector(".audience-score");
+    if (scoreEl) {
+      scoreEl.textContent = (avg === 0 ? "0" : avg.toFixed(1)) + "/10";
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   updateBanner();
   initBossRating();
+  updateListAudienceScores();
 });
+
